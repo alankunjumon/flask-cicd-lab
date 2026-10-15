@@ -32,7 +32,7 @@ jobs:
 
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.76.0
         with:
           image-ref: flask-cicd-lab:${{ github.sha }}
           format: table
