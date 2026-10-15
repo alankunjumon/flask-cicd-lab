@@ -28,7 +28,7 @@ jobs:
           python -c "from app import app; c = app.test_client(); assert c.get('/').status_code == 200; assert c.get('/health').json == {'status': 'healthy'}; print('All tests passed!')"
 
       - name: Build Docker image
-        run: docker build -t flask-cicd-lab:${{ github.sha }}
+        run: docker build -t flask-cicd-lab:${{ github.sha }} .
 
 
       - name: Scan image with Trivy
