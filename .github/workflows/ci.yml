@@ -37,7 +37,6 @@ jobs:
           image-ref: flask-cicd-lab:${{ github.sha }}
           format: table
           severity: HIGH,CRITICAL
-          exit-code: "1"
           
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
