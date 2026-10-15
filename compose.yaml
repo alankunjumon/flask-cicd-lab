@@ -1,0 +1,18 @@
+services:
+  flask:
+    build: .
+    image: flask-compose-lab:1.0
+    ports:
+      - "8080:5000"
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: localdevpass
+      POSTGRES_DB: appdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

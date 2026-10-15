@@ -1,0 +1,57 @@
+
+name: Flask CI/CD
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+
+jobs:
+  build-test-scan-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+  
+      - name: Run unit tests
+        run: |
+          python -c "from app import app; c = app.test_client(); assert c.get('/').status_code == 200; assert c.get('/health').json == {'status': 'healthy'}; print('All tests passed!')"
+
+      - name: Build Docker image
+        run: docker build -t flask-cicd-lab:${{ github.sha }}
+
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: flask-cicd-lab:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::442255790021:role/github-runner-role
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push image to Amazon ECR
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag flask-cicd-lab:$IMAGE_TAG 442255790021.dkr.ecr.us-east-1.amazonaws.com/flask-compose-lab:$IMAGE_TAG
+          docker push 442255790021.dkr.ecr.us-east-1.amazonaws.com/flask-compose-lab:$IMAGE_TAG
+
