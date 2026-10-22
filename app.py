@@ -28,7 +28,6 @@ def home():
                 :root {
                     --bg: #0b1120;
                     --panel: #111a2e;
-                    --panel-light: #17233b;
                     --border: #253451;
                     --text: #e5edf9;
                     --muted: #8fa2c1;
@@ -529,18 +528,12 @@ def home():
 
 @app.route("/health")
 def health():
-    return jsonify({
-        "status": "healthy",
-        "application": APP_NAME,
-        "version": APP_VERSION,
-        "environment": APP_ENV,
-    }), 200
+    # Preserve the exact response expected by the existing unit test.
+    return {"status": "healthy"}
 
 
 @app.route("/ready")
 def ready():
-    # This checks that the Flask application can respond.
-    # Add dependency checks here if the app later uses a database.
     return jsonify({"status": "ready"}), 200
 
 
